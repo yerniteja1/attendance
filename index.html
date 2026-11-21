@@ -169,6 +169,11 @@
     let activeFilter = "ALL";
     let isDayShift = true; // will be set on load
 
+    // ---------- render day/night button ----------
+    function renderDayNightBtn() {
+      document.getElementById('shiftToggle').textContent = isDayShift ? '☀️ Day' : '🌙 Night';
+    }
+
     // ---------- 1️⃣  Try to load the static roster ----------
     async function loadRoster() {
       try {
