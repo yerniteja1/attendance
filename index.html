@@ -36,30 +36,128 @@
     .header-controls {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
     .date-input {
-      padding: 5px 7px;
+      padding: 5px 6px;
       border: 1px solid #cbd5e1;
       border-radius: 7px;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       background: #fff;
       color: #1e293b;
       font-weight: 600;
-      width: 112px;
+      width: 106px;
     }
 
-    .shift-btn {
+    .shift-btn,
+    .admin-btn,
+    .sync-btn {
       background: #e2e8f0;
       border: 1px solid #cbd5e1;
-      padding: 6px 9px;
+      padding: 6px 8px;
       border-radius: 7px;
       font-weight: 700;
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       cursor: pointer;
       color: #1e293b;
       white-space: nowrap;
+    }
+
+    .admin-btn.active {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a;
+    }
+
+    .sync-btn.dirty {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #92400e;
+    }
+
+    .sync-btn.synced {
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #166534;
+    }
+
+    /* Collapsible Admin Panel */
+    .admin-panel {
+      display: none;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .admin-panel.open {
+      display: block;
+    }
+
+    .admin-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: #334155;
+    }
+
+    .add-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .add-grid input {
+      grid-column: span 2;
+    }
+
+    input,
+    select {
+      padding: 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      background: #fff;
+    }
+
+    .add-btn {
+      grid-column: span 2;
+      padding: 9px;
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .sheet-url-row {
+      display: flex;
+      gap: 5px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .sheet-url-row input {
+      flex: 1;
+      font-size: 0.74rem;
+    }
+
+    .tool-btn {
+      padding: 7px 10px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      border-radius: 7px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      cursor: pointer;
+      color: #334155;
     }
 
     .filter-bar {
@@ -139,36 +237,6 @@
       border-color: #0f172a;
     }
 
-    .add-row {
-      display: flex;
-      gap: 5px;
-      margin-bottom: 12px;
-    }
-
-    input,
-    select {
-      padding: 8px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      background: #fff;
-    }
-
-    input#newName {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .add-btn {
-      padding: 0 11px;
-      background: #0f172a;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
     .group-title {
       font-size: 0.76rem;
       font-weight: 700;
@@ -191,7 +259,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 7px;
-      gap: 6px;
+      gap: 5px;
     }
 
     .name {
@@ -201,8 +269,8 @@
     }
 
     .badge-shift {
-      padding: 3px 8px;
-      font-size: 0.72rem;
+      padding: 3px 7px;
+      font-size: 0.71rem;
       font-weight: 800;
       border-radius: 6px;
       border: 1px solid #cbd5e1;
@@ -222,21 +290,34 @@
     }
 
     .role-select {
-      padding: 3px 6px;
-      font-size: 0.74rem;
+      padding: 3px 5px;
+      font-size: 0.73rem;
       border-radius: 6px;
       color: #475569;
       background: #f8fafc;
     }
 
-    .del-btn {
+    .icon-btn {
       border: none;
       background: transparent;
-      color: #94a3b8;
-      font-size: 1.15rem;
+      font-size: 1rem;
       cursor: pointer;
       padding: 0 4px;
       line-height: 1;
+      display: none;
+    }
+
+    .edit-btn {
+      color: #2563eb;
+    }
+
+    .del-btn {
+      color: #dc2626;
+      font-size: 1.15rem;
+    }
+
+    body.admin-mode .icon-btn {
+      display: inline-block;
     }
 
     .btns {
@@ -320,6 +401,40 @@
     <div class="header-controls">
       <input type="date" class="date-input" id="shiftDate" />
       <button class="shift-btn" id="shiftToggle" onclick="toggleDayNight()"></button>
+      <button class="sync-btn" id="syncBtn" onclick="syncNow()" title="Sync with Google Sheet">☁️ Sync</button>
+      <button class="admin-btn" id="adminToggle" onclick="toggleAdmin()">⚙️</button>
+    </div>
+  </div>
+
+  <!-- Collapsible Admin Drawer -->
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-title">Add Worker (Default Settings)</div>
+    <div class="add-grid">
+      <input id="newName" placeholder="Worker full name..." onkeydown="if(event.key==='Enter') addWorker()" />
+      <select id="newRole">
+        <option value="Operators">Role: Operators</option>
+        <option value="Mixers" selected>Role: Mixers</option>
+        <option value="Cutting">Role: Cutting</option>
+        <option value="Shifting">Role: Shifting</option>
+        <option value="Grinding">Role: Grinding</option>
+        <option value="RUC">Role: RUC</option>
+        <option value="Others">Role: Others</option>
+      </select>
+      <select id="newShift">
+        <option value="A" selected>Shift: A</option>
+        <option value="B">Shift: B</option>
+      </select>
+      <select id="newStatus">
+        <option value="HW" selected>Default: Hiwood</option>
+        <option value="HT">Default: HiTech</option>
+        <option value="A">Default: Absent</option>
+      </select>
+      <button class="add-btn" onclick="addWorker()">+ Add Worker</button>
+    </div>
+
+    <div class="sheet-url-row">
+      <input id="sheetUrlInput" placeholder="Paste Google Apps Script /exec URL..." />
+      <button class="tool-btn" onclick="saveSheetUrl()">Save URL</button>
     </div>
   </div>
 
@@ -341,24 +456,6 @@
     </div>
   </div>
 
-  <div class="add-row">
-    <input id="newName" placeholder="Add worker..." onkeydown="if(event.key==='Enter') addWorker()" />
-    <select id="newShift">
-      <option value="A">Shift A</option>
-      <option value="B">Shift B</option>
-    </select>
-    <select id="newRole">
-      <option value="Operators">Operators</option>
-      <option value="Mixers" selected>Mixers</option>
-      <option value="Cutting">Cutting</option>
-      <option value="Shifting">Shifting</option>
-      <option value="Grinding">Grinding</option>
-      <option value="RUC">RUC</option>
-      <option value="Others">Others</option>
-    </select>
-    <button class="add-btn" onclick="addWorker()">+ Add</button>
-  </div>
-
   <div id="list"></div>
 
   <div class="actions">
@@ -369,58 +466,137 @@
   <script>
     const ROLES = ["Operators", "Mixers", "Cutting", "Shifting", "Grinding", "RUC", "Others"];
 
+    // Optional: Paste your Apps Script Web App URL here to pre-configure for all devices
+    const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwCz2Pvf9cIUlzKb8FUdlEyWdvZOCz9EHJ-IJeUgbHL04oKMNz1Fb6Zy5JCCglVg5hI/exec";
+
     const now = new Date();
     const localISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split("T")[0];
     document.getElementById("shiftDate").value = localISO;
 
     let isDayShift = now.getHours() >= 8 && now.getHours() < 20;
-    let activeFilter = localStorage.getItem("hw_v6_filter") || "ALL";
+    let activeFilter = localStorage.getItem("hw_v8_filter") || "ALL";
+    let isAdminOpen = false;
+    let hasUnsyncedChanges = localStorage.getItem("hw_v8_dirty") === "true";
 
     const defaultWorkers = [
-      { name: "Chinnilal Mahato", role: "Operators", shift: "A", status: "HW" },
-      { name: "Ranjeet Yadav", role: "Operators", shift: "A", status: "HW" },
-      { name: "Chandan Mahato", role: "Operators", shift: "A", status: "HT" },
-      { name: "Madhusudan", role: "Operators", shift: "A", status: "HT" },
-      { name: "Sukhdeb", role: "Mixers", shift: "A", status: "HW" },
-      { name: "Sonu", role: "Mixers", shift: "A", status: "HW" },
-      { name: "Deepak-2", role: "Mixers", shift: "A", status: "HW" },
-      { name: "Nilkanth", role: "Mixers", shift: "A", status: "HW" },
-      { name: "Himadar", role: "Cutting", shift: "A", status: "HW" },
-      { name: "Tikechan", role: "Cutting", shift: "A", status: "HW" },
-      { name: "Akash", role: "Cutting", shift: "A", status: "HW" },
-      { name: "Sameer", role: "Shifting", shift: "A", status: "HW" },
-      { name: "Sashi Pandey", role: "Grinding", shift: "A", status: "HW" },
-      { name: "Anuradha", role: "Grinding", shift: "A", status: "HW" },
-      { name: "Dhileswar", role: "RUC", shift: "A", status: "HW" },
-      { name: "Vijayasree", role: "Others", shift: "A", status: "A" },
-      { name: "Banisree", role: "Others", shift: "A", status: "A" },
-      { name: "Prakash Mohali", role: "Others", shift: "A", status: "A" }
+      { name: "Chinnilal Mahato", role: "Operators", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Ranjeet Yadav", role: "Operators", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Chandan Mahato", role: "Operators", shift: "A", status: "HT", updatedAt: 1 },
+      { name: "Madhusudan", role: "Operators", shift: "A", status: "HT", updatedAt: 1 },
+      { name: "Sukhdeb", role: "Mixers", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Sonu", role: "Mixers", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Deepak-2", role: "Mixers", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Nilkanth", role: "Mixers", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Himadar", role: "Cutting", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Tikechan", role: "Cutting", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Akash", role: "Cutting", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Sameer", role: "Shifting", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Sashi Pandey", role: "Grinding", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Anuradha", role: "Grinding", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Dhileswar", role: "RUC", shift: "A", status: "HW", updatedAt: 1 },
+      { name: "Vijayasree", role: "Others", shift: "A", status: "A", updatedAt: 1 },
+      { name: "Banisree", role: "Others", shift: "A", status: "A", updatedAt: 1 },
+      { name: "Prakash Mohali", role: "Others", shift: "A", status: "A", updatedAt: 1 }
     ];
 
-    let workers = JSON.parse(localStorage.getItem("hw_v6_roster")) || defaultWorkers;
-    let activeMachines = JSON.parse(localStorage.getItem("hw_v6_machines")) || [2, 4];
+    let workers = JSON.parse(localStorage.getItem("hw_v8_roster")) || defaultWorkers;
+    let activeMachines = JSON.parse(localStorage.getItem("hw_v8_machines")) || [2, 4];
 
-    function save() {
-      localStorage.setItem("hw_v6_roster", JSON.stringify(workers));
+    function getScriptUrl() {
+      return localStorage.getItem("hw_v8_script_url") || DEFAULT_SCRIPT_URL;
+    }
+
+    document.getElementById("sheetUrlInput").value = getScriptUrl();
+
+    function saveSheetUrl() {
+      const url = document.getElementById("sheetUrlInput").value.trim();
+      localStorage.setItem("hw_v8_script_url", url);
+      alert("Google Sheet URL saved!");
+      syncNow();
+    }
+
+    function updateSyncBadge(stateText, cssClass) {
+      const btn = document.getElementById("syncBtn");
+      btn.textContent = stateText;
+      btn.className = `sync-btn ${cssClass || ""}`;
+    }
+
+    function saveLocal(markDirty = true) {
+      localStorage.setItem("hw_v8_roster", JSON.stringify(workers));
+      if (markDirty) {
+        hasUnsyncedChanges = true;
+        localStorage.setItem("hw_v8_dirty", "true");
+        updateSyncBadge("☁️ Sync*", "dirty");
+      }
       render();
+    }
+
+    // Two-way sync: pushes local edits if dirty, or pulls latest from Google Sheet
+    async function syncNow() {
+      const url = getScriptUrl();
+      if (!url) {
+        toggleAdmin();
+        alert("Paste your Google Apps Script Web App URL in Settings first.");
+        return;
+      }
+
+      updateSyncBadge("⏳ Syncing...", "");
+      try {
+        // 1. Fetch latest remote state
+        const getRes = await fetch(url);
+        const remoteWorkers = await getRes.json();
+
+        const localMaxTime = Math.max(0, ...workers.map(w => w.updatedAt || 0));
+        const remoteMaxTime = Math.max(0, ...remoteWorkers.map(w => w.updatedAt || 0));
+
+        // 2. If local has newer changes (or sheet is empty), push local to Google Sheet
+        if (hasUnsyncedChanges || localMaxTime > remoteMaxTime || remoteWorkers.length === 0) {
+          await fetch(url, {
+            method: "POST",
+            body: JSON.stringify({ workers })
+          });
+          hasUnsyncedChanges = false;
+          localStorage.setItem("hw_v8_dirty", "false");
+        } else if (remoteWorkers.length > 0) {
+          // 3. Otherwise adopt newer changes from Google Sheet
+          workers = remoteWorkers;
+          localStorage.setItem("hw_v8_roster", JSON.stringify(workers));
+          hasUnsyncedChanges = false;
+          localStorage.setItem("hw_v8_dirty", "false");
+          render();
+        }
+
+        updateSyncBadge("✅ Synced", "synced");
+      } catch (err) {
+        console.error(err);
+        updateSyncBadge("⚠️ Offline", "dirty");
+      }
+    }
+
+    function toggleAdmin() {
+      isAdminOpen = !isAdminOpen;
+      document.getElementById("adminPanel").classList.toggle("open", isAdminOpen);
+      document.getElementById("adminToggle").classList.toggle("active", isAdminOpen);
+      document.body.classList.toggle("admin-mode", isAdminOpen);
     }
 
     function setFilter(f) {
       activeFilter = f;
-      localStorage.setItem("hw_v6_filter", f);
+      localStorage.setItem("hw_v8_filter", f);
       render();
     }
 
     function toggleWorkerShift(i) {
       workers[i].shift = workers[i].shift === "A" ? "B" : "A";
-      save();
+      workers[i].updatedAt = Date.now();
+      saveLocal();
     }
 
     function toggleMachine(num) {
       activeMachines = activeMachines.includes(num)
         ? activeMachines.filter(n => n !== num)
         : [...activeMachines, num].sort((a, b) => a - b);
-      localStorage.setItem("hw_v6_machines", JSON.stringify(activeMachines));
+      localStorage.setItem("hw_v8_machines", JSON.stringify(activeMachines));
       renderMachines();
     }
 
@@ -441,29 +617,43 @@
 
     function setStatus(i, status) {
       workers[i].status = status;
-      save();
+      workers[i].updatedAt = Date.now();
+      saveLocal();
     }
 
     function setRole(i, role) {
       workers[i].role = role;
-      save();
+      workers[i].updatedAt = Date.now();
+      saveLocal();
+    }
+
+    function editWorkerName(i) {
+      const updated = prompt("Edit worker name:", workers[i].name);
+      if (updated && updated.trim()) {
+        workers[i].name = updated.trim();
+        workers[i].updatedAt = Date.now();
+        saveLocal();
+      }
     }
 
     function addWorker() {
       const input = document.getElementById("newName");
       const role = document.getElementById("newRole").value;
       const shift = document.getElementById("newShift").value;
+      const status = document.getElementById("newStatus").value;
       const name = input.value.trim();
       if (!name) return;
-      workers.push({ name, role, shift, status: "HW" });
+
+      workers.push({ name, role, shift, status, updatedAt: Date.now() });
       input.value = "";
-      save();
+      saveLocal();
     }
 
     function removeWorker(i) {
       if (confirm(`Remove ${workers[i].name}?`)) {
         workers.splice(i, 1);
-        save();
+        workers.forEach(w => w.updatedAt = Date.now());
+        saveLocal();
       }
     }
 
@@ -506,11 +696,12 @@
             <div class="card">
               <div class="card-top">
                 <span class="name">${w.name}</span>
-                <button class="badge-shift ${w.shift === 'A' ? 'shift-a' : 'shift-b'}" onclick="toggleWorkerShift(${w.idx})" title="Tap to switch A/B shift">Shift ${w.shift}</button>
+                <button class="icon-btn edit-btn" onclick="editWorkerName(${w.idx})" title="Rename">✎</button>
+                <button class="badge-shift ${w.shift === 'A' ? 'shift-a' : 'shift-b'}" onclick="toggleWorkerShift(${w.idx})">Shift ${w.shift}</button>
                 <select class="role-select" onchange="setRole(${w.idx}, this.value)">
                   ${ROLES.map(r => `<option value="${r}" ${r === w.role ? "selected" : ""}>${r}</option>`).join("")}
                 </select>
-                <button class="del-btn" onclick="removeWorker(${w.idx})" title="Remove">×</button>
+                <button class="icon-btn del-btn" onclick="removeWorker(${w.idx})" title="Remove">×</button>
               </div>
               <div class="btns">
                 <button class="st-btn ${w.status === 'HW' ? 'active-hw' : ''}" onclick="setStatus(${w.idx},'HW')">Hiwood</button>
@@ -596,6 +787,7 @@
     }
 
     render();
+    if (getScriptUrl()) syncNow();
   </script>
 </body>
 
