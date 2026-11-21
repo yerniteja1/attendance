@@ -174,22 +174,70 @@
       document.getElementById('shiftToggle').textContent = isDayShift ? '☀️ Day' : '🌙 Night';
     }
 
-    // ---------- 1️⃣  Try to load the static roster ----------
+    // ---------- 1️⃣  Try to load the static roster (sync on every visit) ----------
     async function loadRoster() {
+      // Reset localStorage entries so the fetch is always attempted
+      localStorage.removeItem("hw_v9_roster");
+      localStorage.removeItem("hw_v9_machines");
+      localStorage.removeItem("hw_v9_filter");
+
+      // --- Step 1: try CSV first (the preferred format) ---
       try {
-        const resp = await fetch(RAW_ROSTER_URL, { cache: "no-cache" });
-        if (!resp.ok) throw new Error("network error");
-        const data = await resp.json();
-        // Expected format: { workers: [...] } or just [...]
-        workers = Array.isArray(data) ? data : (data.workers || []);
-        // optional machine list if present
-        if (data && data.activeMachines) activeMachines = data.activeMachines;
-        // persist in localStorage so next visit is instant
-        localStorage.setItem("hw_v9_roster", JSON.stringify(workers));
-        localStorage.setItem("hw_v9_machines", JSON.stringify(activeMachines));
-      } catch (e) {
-        console.warn("Could not load workers.json, using built‑in defaults", e);
-        // built‑in defaults (the original 27 workers)
+        const resp = await fetch(RAW_CSV_URL, { cache: "no-cache" });
+        if (resp.ok) {
+          const text = await resp.text();
+          const lines = text.trim().split("\n");
+          const header = lines[0].split(",");
+          const rows = lines.slice(1).filter(l => l.length).map(l => {
+            const obj = {};
+            header.forEach((h, i) => (obj[h.trim()] = l.split(",")[i]?.trim()));
+            return obj;
+          });
+          workers = rows;
+          // keep your default machine list (CSV does not carry machine data)
+          activeMachines = [2, 4];
+          activeFilter = "ALL";
+          // store in localStorage for future offline use
+          localStorage.setItem("hw_v9_roster", JSON.stringify(workers));
+          localStorage.setItem("hw_v9_machines", JSON.stringify(activeMachines));
+          localStorage.setItem("hw_v9_filter", activeFilter);
+          console.log("✅ Roster synced from CSV");
+          return; // stop – we have our data
+        }
+      } catch (csvErr) {
+        console.warn("CSV load failed, trying JSON", csvErr);
+      }
+
+      // --- Step 2: try JSON fallback ---
+      try {
+        const jsonResp = await fetch(RAW_JSON_URL, { cache: "no-cache" });
+        if (jsonResp.ok) {
+          const data = await jsonResp.json();
+          workers = data.workers ? data.workers : (Array.isArray(data) ? data : []);
+          activeMachines = [2, 4];
+          activeFilter = "ALL";
+          localStorage.setItem("hw_v9_roster", JSON.stringify(workers));
+          localStorage.setItem("hw_v9_machines", JSON.stringify(activeMachines));
+          localStorage.setItem("hw_v9_filter", activeFilter);
+          console.log("✅ Roster synced from JSON");
+          return;
+        }
+      } catch (jsonErr) {
+        console.warn("JSON load failed, falling back to cached or defaults", jsonErr);
+      }
+
+      // --- Step 3: use whatever is in localStorage (offline fallback) ---
+      const cachedRoster = localStorage.getItem("hw_v9_roster");
+      if (cachedRoster) {
+        workers = JSON.parse(cachedRoster);
+        // keep the machine/filter that were cached earlier, or defaults
+        const cachedMachines = localStorage.getItem("hw_v9_machines");
+        if (cachedMachines) activeMachines = JSON.parse(cachedMachines);
+        const cachedFilter = localStorage.getItem("hw_v9_filter");
+        if (cachedFilter) activeFilter = cachedFilter;
+        console.log("ℹ️ Using cached roster (offline)");
+      } else {
+        // --- Step 4: last resort – built‑in defaults ---
         workers = [
           { name:"Chinnilal Mahato", role:"Operators", shift:"A", status:"HW" },
           { name:"Ranjeet Yadav",   role:"Operators", shift:"A", status:"HW" },
@@ -210,12 +258,14 @@
           { name:"Banisree",        role:"Others",    shift:"A", status:"A" },
           { name:"Prakash Mohali",  role:"Others",    shift:"A", status:"A" }
         ];
-        localStorage.setItem("hw_v9_roster", JSON.stringify(workers));
+        activeMachines = [2, 4];
+        activeFilter = "ALL";
+        console.log("ℹ️ Using built‑in default roster (no network)");
       }
-      // After loading, render the UI
-      renderDayNightBtn();
-      renderMachines();
-      render();
+      // persist again in case we just used cache
+      localStorage.setItem("hw_v9_roster", JSON.stringify(workers));
+      localStorage.setItem("hw_v9_machines", JSON.stringify(activeMachines));
+      localStorage.setItem("hw_v9_filter", activeFilter);
     }
 
     // ---------- 2️⃣  (Optional) CSV loader ----------
