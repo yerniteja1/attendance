@@ -473,6 +473,9 @@
     const localISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split("T")[0];
     document.getElementById("shiftDate").value = localISO;
 
+    // Clear any previously stored script URL so the hard‑coded one is used
+    localStorage.removeItem("hw_v8_script_url");
+
     let isDayShift = now.getHours() >= 8 && now.getHours() < 20;
     let activeFilter = localStorage.getItem("hw_v8_filter") || "ALL";
     let isAdminOpen = false;
