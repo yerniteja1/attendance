@@ -17,7 +17,7 @@
     { "name": "Dhileswar", "role": "RUC", "shift": "A", "status": "HW" },
     { "name": "Vijayasree", "role": "Others", "shift": "A", "status": "A" },
     { "name": "Banisree", "role": "Others", "shift": "A", "status": "A" },
-    { "name": "Prakash Mohali", "role": "Others", "shift": "A", "status": "A" }
+    { "name": "Prakash Mohali", "role": "Others", "shift": "B", "status": "A" }
   ],
   "activeMachines": [2, 4],
   "filter": "ALL"
