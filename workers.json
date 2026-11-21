@@ -17,7 +17,9 @@
     { "name": "Dhileswar", "role": "RUC", "shift": "A", "status": "HW" },
     { "name": "Vijayasree", "role": "Others", "shift": "A", "status": "A" },
     { "name": "Banisree", "role": "Others", "shift": "A", "status": "A" },
-    { "name": "Prakash Mohali", "role": "Others", "shift": "B", "status": "A" }
+    { "name": "Prakash Mohali", "role": "Others", "shift": "B", "status": "A" },
+    {"name": "Anil Bhoi","role":"Mixers", "shift":"A","status":"HT"},
+    {"name":"Ketra","role":"Cutting", "shift":"A","status":"HT"}
   ],
   "activeMachines": [2, 4],
   "filter": "ALL"
