@@ -1,55 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Production Manpower Allocation</title>
   <style>
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; max-width: 520px; margin: 0 auto; padding: 14px; background: #f1f5f9; color: #0f172a; padding-bottom: 84px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 6px; }
-    h2 { margin: 0; font-size: 1.02rem; }
-    .header-controls { display: flex; align-items: center; gap: 6px; }
-    .date-input { padding: 5px 7px; border: 1px solid #cbd5e1; border-radius: 7px; font-size: 0.74rem; background: #fff; color: #1e293b; font-weight: 600; width: 112px; }
-    .shift-btn { background: #e2e8f0; border: 1px solid #cbd5e1; padding: 6px 9px; border-radius: 7px; font-weight: 700; font-size: 0.75rem; cursor: pointer; color: #1e293b; white-space: nowrap; }
-    
-    .filter-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; background: #e2e8f0; padding: 4px; border-radius: 9px; }
-    .f-btn { border: none; background: transparent; padding: 6px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; color: #475569; cursor: pointer; }
-    .f-btn.active { background: #fff; color: #0f172a; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+    * {
+      box-sizing: border-box;
+    }
 
-    .meta-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; background: #fff; padding: 8px 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
-    .counts { font-size: 0.78rem; font-weight: 600; color: #475569; }
-    .machines-box { display: flex; align-items: center; gap: 4px; }
-    .machines-label { font-size: 0.74rem; font-weight: 700; color: #64748b; margin-right: 2px; }
-    .m-btn { width: 26px; height: 26px; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 6px; font-size: 0.76rem; font-weight: 700; cursor: pointer; color: #334155; padding: 0; }
-    .m-btn.active { background: #0f172a; color: #fff; border-color: #0f172a; }
-    
-    .add-row { display: flex; gap: 5px; margin-bottom: 12px; }
-    input, select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.82rem; background: #fff; }
-    input#newName { flex: 1; min-width: 0; }
-    .add-btn { padding: 0 11px; background: #0f172a; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    
-    .group-title { font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; margin: 14px 0 6px 2px; }
-    .card { background: #fff; border-radius: 10px; padding: 9px 10px; margin-bottom: 7px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
-    .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; gap: 6px; }
-    .name { font-weight: 600; font-size: 0.92rem; flex: 1; }
-    .badge-shift { padding: 3px 8px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; border: 1px solid #cbd5e1; cursor: pointer; }
-    .shift-a { background: #fef3c7; color: #92400e; border-color: #fde68a; }
-    .shift-b { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
-    .role-select { padding: 3px 6px; font-size: 0.74rem; border-radius: 6px; color: #475569; background: #f8fafc; }
-    .del-btn { border: none; background: transparent; color: #94a3b8; font-size: 1.15rem; cursor: pointer; padding: 0 4px; line-height: 1; }
-    
-    .btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .st-btn { border: 1px solid #cbd5e1; background: #f8fafc; padding: 6px 4px; border-radius: 7px; font-weight: 700; cursor: pointer; font-size: 0.76rem; color: #334155; text-align: center; }
-    .active-hw { background: #16a34a; color: #fff; border-color: #16a34a; }
-    .active-ht { background: #2563eb; color: #fff; border-color: #2563eb; }
-    .active-a  { background: #dc2626; color: #fff; border-color: #dc2626; }
-    
-    .actions { display: flex; gap: 8px; position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); width: calc(100% - 28px); max-width: 492px; }
-    .wa-btn { flex: 2; padding: 13px; background: #16a34a; color: #fff; font-size: 0.92rem; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(22,163,74,0.3); }
-    .copy-btn { flex: 1; padding: 13px; background: #0f172a; color: #fff; font-size: 0.92rem; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(15,23,42,0.2); }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 14px;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding-bottom: 84px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 6px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .date-input {
+      padding: 5px 7px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 0.74rem;
+      background: #fff;
+      color: #1e293b;
+      font-weight: 600;
+      width: 112px;
+    }
+
+    .shift-btn {
+      background: #e2e8f0;
+      border: 1px solid #cbd5e1;
+      padding: 6px 9px;
+      border-radius: 7px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      color: #1e293b;
+      white-space: nowrap;
+    }
+
+    .filter-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 9px;
+    }
+
+    .f-btn {
+      border: none;
+      background: transparent;
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .f-btn.active {
+      background: #fff;
+      color: #0f172a;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    .meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      background: #fff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .counts {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .machines-box {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .machines-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #64748b;
+      margin-right: 2px;
+    }
+
+    .m-btn {
+      width: 26px;
+      height: 26px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #334155;
+      padding: 0;
+    }
+
+    .m-btn.active {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a;
+    }
+
+    .add-row {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+
+    input,
+    select {
+      padding: 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      background: #fff;
+    }
+
+    input#newName {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .add-btn {
+      padding: 0 11px;
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .group-title {
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      margin: 14px 0 6px 2px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 9px 10px;
+      margin-bottom: 7px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 7px;
+      gap: 6px;
+    }
+
+    .name {
+      font-weight: 600;
+      font-size: 0.92rem;
+      flex: 1;
+    }
+
+    .badge-shift {
+      padding: 3px 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
+    }
+
+    .shift-a {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+
+    .shift-b {
+      background: #e0e7ff;
+      color: #3730a3;
+      border-color: #c7d2fe;
+    }
+
+    .role-select {
+      padding: 3px 6px;
+      font-size: 0.74rem;
+      border-radius: 6px;
+      color: #475569;
+      background: #f8fafc;
+    }
+
+    .del-btn {
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 1.15rem;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+    }
+
+    .btns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .st-btn {
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      padding: 6px 4px;
+      border-radius: 7px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.76rem;
+      color: #334155;
+      text-align: center;
+    }
+
+    .active-hw {
+      background: #16a34a;
+      color: #fff;
+      border-color: #16a34a;
+    }
+
+    .active-ht {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+
+    .active-a {
+      background: #dc2626;
+      color: #fff;
+      border-color: #dc2626;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 28px);
+      max-width: 492px;
+    }
+
+    .wa-btn {
+      flex: 2;
+      padding: 13px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 0.92rem;
+      font-weight: 700;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+
+    .copy-btn {
+      flex: 1;
+      padding: 13px;
+      background: #0f172a;
+      color: #fff;
+      font-size: 0.92rem;
+      font-weight: 700;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+    }
   </style>
 </head>
+
 <body>
   <div class="header">
     <h2>Manpower</h2>
@@ -105,6 +369,25 @@
   <script>
     const ROLES = ["Operators", "Mixers", "Cutting", "Shifting", "Grinding", "RUC", "Others"];
 
+    // Single source of truth: load workers from workers.json
+    let workers = [];
+    let activeMachines = [2, 4];
+
+    // Fetch workers data from workers.json (the only data source)
+    fetch('workers.json')
+      .then(response => response.json())
+      .then(data => {
+        workers = data;
+        activeMachines = [];
+        render();
+      })
+      .catch(err => {
+        console.error('Failed to load workers.json', err);
+        // Fallback to empty state - no hardcoded defaults
+        workers = [];
+        render();
+      });
+
     const now = new Date();
     const localISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().split("T")[0];
     document.getElementById("shiftDate").value = localISO;
@@ -112,29 +395,7 @@
     let isDayShift = now.getHours() >= 8 && now.getHours() < 20;
     let activeFilter = localStorage.getItem("hw_v6_filter") || "ALL";
 
-    const defaultWorkers = [
-      { name: "Chinnilal Mahato", role: "Operators", shift: "A", status: "HW" },
-      { name: "Ranjeet Yadav", role: "Operators", shift: "A", status: "HW" },
-      { name: "Chandan Mahato", role: "Operators", shift: "A", status: "HT" },
-      { name: "Madhusudan", role: "Operators", shift: "A", status: "HT" },
-      { name: "Sukhdeb", role: "Mixers", shift: "A", status: "HW" },
-      { name: "Sonu", role: "Mixers", shift: "A", status: "HW" },
-      { name: "Deepak-2", role: "Mixers", shift: "A", status: "HW" },
-      { name: "Nilkanth", role: "Mixers", shift: "A", status: "HW" },
-      { name: "Himadar", role: "Cutting", shift: "A", status: "HW" },
-      { name: "Tikechan", role: "Cutting", shift: "A", status: "HW" },
-      { name: "Akash", role: "Cutting", shift: "A", status: "HW" },
-      { name: "Sameer", role: "Shifting", shift: "A", status: "HW" },
-      { name: "Sashi Pandey", role: "Grinding", shift: "A", status: "HW" },
-      { name: "Anuradha", role: "Grinding", shift: "A", status: "HW" },
-      { name: "Dhileswar", role: "RUC", shift: "A", status: "HW" },
-      { name: "Vijayasree", role: "Others", shift: "A", status: "A" },
-      { name: "Banisree", role: "Others", shift: "A", status: "A" },
-      { name: "Prakash Mohali", role: "Others", shift: "A", status: "A" }
-    ];
-
-    let workers = JSON.parse(localStorage.getItem("hw_v6_roster")) || defaultWorkers;
-    let activeMachines = JSON.parse(localStorage.getItem("hw_v6_machines")) || [2, 4];
+    // Use activeMachines from fetched data (global already declared above)
 
     function save() {
       localStorage.setItem("hw_v6_roster", JSON.stringify(workers));
@@ -148,7 +409,7 @@
     }
 
     function toggleWorkerShift(i) {
-      workers[i].shift = workers[i].shift === "A" ? "B" : "A";
+      workers[i][2] = workers[i][2] === "A" ? "B" : "A";
       save();
     }
 
@@ -176,12 +437,12 @@
     }
 
     function setStatus(i, status) {
-      workers[i].status = status;
+      workers[i][3] = status;
       save();
     }
 
     function setRole(i, role) {
-      workers[i].role = role;
+      workers[i][1] = role;
       save();
     }
 
@@ -191,13 +452,13 @@
       const shift = document.getElementById("newShift").value;
       const name = input.value.trim();
       if (!name) return;
-      workers.push({ name, role, shift, status: "HW" });
+      workers.push([name, role, shift, "HW"]);
       input.value = "";
       save();
     }
 
     function removeWorker(i) {
-      if (confirm(`Remove ${workers[i].name}?`)) {
+      if (confirm(`Remove ${workers[i][0]}?`)) {
         workers.splice(i, 1);
         save();
       }
@@ -206,11 +467,11 @@
     function getVisibleWorkers() {
       return workers
         .map((w, idx) => ({ ...w, idx }))
-        .filter(w => activeFilter === "ALL" || w.shift === activeFilter);
+        .filter(w => activeFilter === "ALL" || w[2] === activeFilter);
     }
 
     function nonOpCount(status) {
-      return getVisibleWorkers().filter(w => w.status === status && w.role !== "Operators").length;
+      return getVisibleWorkers().filter(w => w[3] === status && w[1] !== "Operators").length;
     }
 
     function render() {
@@ -233,7 +494,7 @@
       const list = document.getElementById("list");
 
       list.innerHTML = ROLES.map(role => {
-        const items = visible.filter(w => w.role === role);
+        const items = visible.filter(w => w[1] === role);
         if (!items.length) return "";
 
         return `
@@ -241,17 +502,17 @@
           ${items.map(w => `
             <div class="card">
               <div class="card-top">
-                <span class="name">${w.name}</span>
-                <button class="badge-shift ${w.shift === 'A' ? 'shift-a' : 'shift-b'}" onclick="toggleWorkerShift(${w.idx})" title="Tap to switch A/B shift">Shift ${w.shift}</button>
+                <span class="name">${w[0]}</span>
+                <button class="badge-shift ${w[2] === 'A' ? 'shift-a' : 'shift-b'}" onclick="toggleWorkerShift(${w.idx})" title="Tap to switch A/B shift">Shift ${w[2]}</button>
                 <select class="role-select" onchange="setRole(${w.idx}, this.value)">
-                  ${ROLES.map(r => `<option value="${r}" ${r === w.role ? "selected" : ""}>${r}</option>`).join("")}
+                  ${ROLES.map(r => `<option value="${r}" ${r === w[1] ? "selected" : ""}>${r}</option>`).join("")}
                 </select>
                 <button class="del-btn" onclick="removeWorker(${w.idx})" title="Remove">×</button>
               </div>
               <div class="btns">
-                <button class="st-btn ${w.status === 'HW' ? 'active-hw' : ''}" onclick="setStatus(${w.idx},'HW')">Hiwood</button>
-                <button class="st-btn ${w.status === 'HT' ? 'active-ht' : ''}" onclick="setStatus(${w.idx},'HT')">HiTech</button>
-                <button class="st-btn ${w.status === 'A' ? 'active-a' : ''}" onclick="setStatus(${w.idx},'A')">Absent</button>
+                <button class="st-btn ${w[3] === 'HW' ? 'active-hw' : ''}" onclick="setStatus(${w.idx},'HW')">Hiwood</button>
+                <button class="st-btn ${w[3] === 'HT' ? 'active-ht' : ''}" onclick="setStatus(${w.idx},'HT')">HiTech</button>
+                <button class="st-btn ${w[3] === 'A' ? 'active-a' : ''}" onclick="setStatus(${w.idx},'A')">Absent</button>
               </div>
             </div>
           `).join("")}
@@ -332,4 +593,5 @@
     render();
   </script>
 </body>
+
 </html>
