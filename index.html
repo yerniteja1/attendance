@@ -347,15 +347,7 @@
       <option value="A">Shift A</option>
       <option value="B">Shift B</option>
     </select>
-    <select id="newRole">
-      <option value="Operators">Operators</option>
-      <option value="Mixers" selected>Mixers</option>
-      <option value="Cutting">Cutting</option>
-      <option value="Shifting">Shifting</option>
-      <option value="Grinding">Grinding</option>
-      <option value="RUC">RUC</option>
-      <option value="Others">Others</option>
-    </select>
+    <select id="newRole"></select>
     <button class="add-btn" onclick="addWorker()">+ Add</button>
   </div>
 
@@ -367,7 +359,40 @@
   </div>
 
   <script>
-    const ROLES = ["Operators", "Mixers", "Cutting", "Shifting", "Grinding", "RUC", "Others"];
+    const ROLES = [
+      "Operators",
+      "Mixers",
+      "Hopping",
+      "Cutting",
+      "Cleaning",
+      "Grinding Cleaning",
+      "Floor Cleaning",
+      "Maintenance",
+      "PVC",
+      "WPC",
+      "RUC",
+      "RUC Sewing Bags",
+      "Office Work",
+      "Shifting",
+      "Grinding",
+      "Others"
+    ];
+
+    // Display labels (data values stay unchanged so existing workers keep working)
+    const ROLE_LABELS = {
+      Mixers: "Mixing (M1-5)"
+    };
+
+    function roleLabel(role) {
+      return ROLE_LABELS[role] || role;
+    }
+
+    function renderNewRoleOptions() {
+      const sel = document.getElementById("newRole");
+      sel.innerHTML = ROLES
+        .map(r => `<option value="${r}" ${r === "Mixers" ? "selected" : ""}>${roleLabel(r)}</option>`)
+        .join("");
+    }
 
     // Single source of truth: load workers from workers.json
     let workers = [];
@@ -466,12 +491,12 @@
 
     function getVisibleWorkers() {
       return workers
-        .map((w, idx) => ({ ...w, idx }))
-        .filter(w => activeFilter === "ALL" || w[2] === activeFilter);
+        .map((w, idx) => ({ name: w[0], role: w[1], shift: w[2], status: w[3], idx }))
+        .filter(w => activeFilter === "ALL" || w.shift === activeFilter);
     }
 
     function nonOpCount(status) {
-      return getVisibleWorkers().filter(w => w[3] === status && w[1] !== "Operators").length;
+      return getVisibleWorkers().filter(w => w.status === status && w.role !== "Operators").length;
     }
 
     function render() {
@@ -494,25 +519,25 @@
       const list = document.getElementById("list");
 
       list.innerHTML = ROLES.map(role => {
-        const items = visible.filter(w => w[1] === role);
+        const items = visible.filter(w => w.role === role);
         if (!items.length) return "";
 
         return `
-          <div class="group-title">${role} (${items.length})</div>
+          <div class="group-title">${roleLabel(role)} (${items.length})</div>
           ${items.map(w => `
             <div class="card">
               <div class="card-top">
-                <span class="name">${w[0]}</span>
-                <button class="badge-shift ${w[2] === 'A' ? 'shift-a' : 'shift-b'}" onclick="toggleWorkerShift(${w.idx})" title="Tap to switch A/B shift">Shift ${w[2]}</button>
+                <span class="name">${w.name}</span>
+                <button class="badge-shift ${w.shift === 'A' ? 'shift-a' : 'shift-b'}" onclick="toggleWorkerShift(${w.idx})" title="Tap to switch A/B shift">Shift ${w.shift}</button>
                 <select class="role-select" onchange="setRole(${w.idx}, this.value)">
-                  ${ROLES.map(r => `<option value="${r}" ${r === w[1] ? "selected" : ""}>${r}</option>`).join("")}
+                  ${ROLES.map(r => `<option value="${r}" ${r === w.role ? "selected" : ""}>${roleLabel(r)}</option>`).join("")}
                 </select>
                 <button class="del-btn" onclick="removeWorker(${w.idx})" title="Remove">×</button>
               </div>
               <div class="btns">
-                <button class="st-btn ${w[3] === 'HW' ? 'active-hw' : ''}" onclick="setStatus(${w.idx},'HW')">Hiwood</button>
-                <button class="st-btn ${w[3] === 'HT' ? 'active-ht' : ''}" onclick="setStatus(${w.idx},'HT')">HiTech</button>
-                <button class="st-btn ${w[3] === 'A' ? 'active-a' : ''}" onclick="setStatus(${w.idx},'A')">Absent</button>
+                <button class="st-btn ${w.status === 'HW' ? 'active-hw' : ''}" onclick="setStatus(${w.idx},'HW')">Hiwood</button>
+                <button class="st-btn ${w.status === 'HT' ? 'active-ht' : ''}" onclick="setStatus(${w.idx},'HT')">HiTech</button>
+                <button class="st-btn ${w.status === 'A' ? 'active-a' : ''}" onclick="setStatus(${w.idx},'A')">Absent</button>
               </div>
             </div>
           `).join("")}
@@ -528,9 +553,9 @@
     }
 
     function getMixerHeader() {
-      if (!activeMachines.length) return "_Mixers:_";
+      if (!activeMachines.length) return "_Mixing (M1-5):_";
       const label = activeMachines.length === 1 ? "machine running" : "machines running";
-      return `_Mixers (${activeMachines.join(", ")} ${label}):_`;
+      return `_Mixing (M1-5) - ${activeMachines.join(", ")} ${label}:_`;
     }
 
     function formatSectionBlock(list, useRoleHeaders) {
@@ -549,7 +574,7 @@
         if (!matched.length) return;
 
         if (useRoleHeaders) {
-          lines.push(role === "Mixers" ? getMixerHeader() : `_${role}:_`);
+          lines.push(role === "Mixers" ? getMixerHeader() : `_${roleLabel(role)}:_`);
         }
 
         matched.forEach(w => lines.push(`${counter++}. ${w.name}`));
@@ -590,6 +615,7 @@
       navigator.clipboard.writeText(buildMessage()).then(() => alert("Copied to clipboard!"));
     }
 
+    renderNewRoleOptions();
     render();
   </script>
 </body>
